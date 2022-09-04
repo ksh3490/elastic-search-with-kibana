@@ -7,15 +7,12 @@ services:
     volumes:
       - type: bind
         source: "${PWD}/elasticsearch/config/elasticsearch.yml"
-        target: usr/share/elasticsearch/config/elasticsearch.yml
+        target: /usr/share/elasticsearch/config/elasticsearch.yml
         read_only: true
       - "${PWD}/elasticsearch/data:/usr/share/elasticsearch/data"
     ports:
       - "9200:9200"
       - "9300:9300"
-    # environment:
-    #   - bootstrap.memory_lock=true
-    #   - "ES_JAVA_OPTS=-Xms4g -Xmx4g"
     networks:
       - elastic
   # logstash:
@@ -25,11 +22,11 @@ services:
   #   volumes:
   #     - type: bind
   #       source: "{PWD}/logstash/config/logstash.yml"
-  #       target: "usr/share/logstash/config/logstash.yml"
+  #       target: "/usr/share/logstash/config/logstash.yml"
   #       read_only: true
   #     - type: bind
   #       source: "{PWD}/logstash/pipeline"
-  #       target: "usr/share/logstash/pipeline"
+  #       target: "/usr/share/logstash/pipeline"
   #       read_only: true
   #   ports:
   #     - "5001:5001/tcp"

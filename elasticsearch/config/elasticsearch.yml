@@ -2,7 +2,8 @@
 ## https://github.com/elastic/elasticsearch/blob/master/distribution/docker/src/docker/config/elasticsearch.yml
 #
 
-cluster.name: "docker-cluster"
+cluster.name: "es-cluster-1"
+node.name: "node-1"
 network.host: 0.0.0.0
 
 ## X-Pack settings
