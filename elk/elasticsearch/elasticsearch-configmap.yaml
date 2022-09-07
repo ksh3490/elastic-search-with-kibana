@@ -17,5 +17,5 @@ data:
   #  master: false
   #  data: true
   #  ingest: false
-  #xpack.security.enabled: true		# X pack의 경우 보안설정
-  #xpack.monitoring.collection.enabled: true
+  xpack.security.enabled: "false" # X pack 보안설정 비활성화
+  xpack.monitoring.collection.enabled: "true"

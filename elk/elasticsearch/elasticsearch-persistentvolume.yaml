@@ -15,7 +15,7 @@ spec:
   claimRef: # 연결할 PVC를 지정
     namespace: elk
     name: elasticsearch-persistent-storage-elasticsearch-node-0
-  persistentVolumeReclainPolicy: Delete # PVC를 삭제하면 볼륨도 자동으로 삭제 -> 데이터를 보존하려면 Retain 정책을 사용할 것
+  persistentVolumeReclaimPolicy: Delete # PVC를 삭제하면 볼륨도 자동으로 삭제 -> 데이터를 보존하려면 Retain 정책을 사용할 것
   hostPath:
     path: /data/es
     type: DirectoryOrCreate # 디렉터리가 존재하면 매핑, 없으면 새로 생성 후 매핑

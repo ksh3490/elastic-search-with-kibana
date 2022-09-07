@@ -1,3 +1,57 @@
+# Create Namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: elk
+---
+# Create Persistent Volume
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  namespace: elk
+  name: elasticsearch-pv
+  labels:
+    name: elasticsearch
+spec:
+  storageClassName: standard
+  capacity:
+    storage: 1Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce # 한 개의 노드에서만 읽고 쓸 수 있음
+  claimRef: # 연결할 PVC를 지정
+    namespace: elk
+    name: elasticsearch-persistent-storage-elasticsearch-node-0
+  persistentVolumeReclaimPolicy: Delete # PVC를 삭제하면 볼륨도 자동으로 삭제 -> 데이터를 보존하려면 Retain 정책을 사용할 것
+  hostPath:
+    path: /data/es
+    type: DirectoryOrCreate # 디렉터리가 존재하면 매핑, 없으면 새로 생성 후 매핑
+---
+# Create Config Map
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: elk
+  name: elasticsearch-config
+  labels:
+    app: elasticsearch
+    #role: data
+data:
+  elasticsearch.yml: |-
+  cluster.name: ${CLUSTER_NAME} # 클러스터 이름
+  network.host: 0.0.0.0 # 외부 접근
+
+  #node.name: ${NODE_NAME}        # 노드 이름
+  #discovery.seed_hosts: ${NODE_LIST}			# 노드 리스트
+  #cluster.initial_master_nodes: ${MASTER_NODES}	#마스터 노드
+  #node:					# 노드 정보 옵션
+  #  master: false
+  #  data: true
+  #  ingest: false
+  xpack.security.enabled: "false" # X pack 보안설정 비활성화
+  xpack.monitoring.collection.enabled: "true"
+---
+# Create Stateful Set and Pod
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -21,7 +75,6 @@ spec:
         - name: elasticsearch
           image: docker.elastic.co/elasticsearch/elasticsearch:8.4.1
           imagePullPolicy: IfNotPresent
-          command: ["sh", "-c", "echo"]
           env:
             - name: CLUSTER_NAME
               value: elk-cluster
@@ -73,3 +126,39 @@ spec:
         resources:
           requests:
             storage: 1Gi
+---
+# Create Service
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: elk
+  name: elasticsearch
+  labels:
+    app: elasticsearch
+spec:
+  clusterIP: None
+  ports:
+    - name: rest
+      port: 9200
+    - name: transport
+      port: 9300
+  selector:
+    app: elasticsearch
+---
+# Create Service
+kind: Service
+apiVersion: v1
+metadata:
+  namespace: elk
+  name: elasticsearch-nodeport
+  labels:
+    app: elasticsearch
+spec:
+  type: NodePort
+  ports:
+    - nodePort: 30920
+      port: 9200
+      targetPort: 9200
+      protocol: TCP
+  selector:
+    app: elasticsearch
