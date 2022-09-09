@@ -1,10 +1,10 @@
-# Create Namespace
+# Create namespace
 apiVersion: v1
 kind: Namespace
 metadata:
   name: elk
 ---
-# Create Persistent Volume
+# Create persistentvolume
 apiVersion: v1
 kind: PersistentVolume
 metadata:
@@ -18,16 +18,16 @@ spec:
     storage: 1Gi
   volumeMode: Filesystem
   accessModes:
-    - ReadWriteOnce # 한 개의 노드에서만 읽고 쓸 수 있음
-  claimRef: # 연결할 PVC를 지정
+    - ReadWriteOnce
+  claimRef:
     namespace: elk
     name: elasticsearch-persistent-storage-elasticsearch-node-0
-  persistentVolumeReclaimPolicy: Delete # PVC를 삭제하면 볼륨도 자동으로 삭제 -> 데이터를 보존하려면 Retain 정책을 사용할 것
+  persistentVolumeReclaimPolicy: Delete
   hostPath:
     path: /data/es
-    type: DirectoryOrCreate # 디렉터리가 존재하면 매핑, 없으면 새로 생성 후 매핑
+    type: DirectoryOrCreate
 ---
-# Create Config Map
+# Create Configmap
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -38,20 +38,20 @@ metadata:
     #role: data
 data:
   elasticsearch.yml: |-
-  cluster.name: ${CLUSTER_NAME} # 클러스터 이름
-  network.host: 0.0.0.0 # 외부 접근
+    cluster.name: ${CLUSTER_NAME}
+    network.host: 0.0.0.0
 
-  #node.name: ${NODE_NAME}        # 노드 이름
-  #discovery.seed_hosts: ${NODE_LIST}			# 노드 리스트
-  #cluster.initial_master_nodes: ${MASTER_NODES}	#마스터 노드
-  #node:					# 노드 정보 옵션
-  #  master: false
-  #  data: true
-  #  ingest: false
-  xpack.security.enabled: "false" # X pack 보안설정 비활성화
-  xpack.monitoring.collection.enabled: "true"
+    #node.name: ${NODE_NAME}
+    #discovery.seed_hosts: ${NODE_LIST}
+    #cluster.initial_master_nodes: ${MASTER_NODES}
+    #node:
+    #  master: false
+    #  data: true
+    #  ingest: false
+    #xpack.security.enabled: true
+    #xpack.monitoring.collection.enabled: true
 ---
-# Create Stateful Set and Pod
+# Create StatefulSet and Pod
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -73,8 +73,16 @@ spec:
     spec:
       containers:
         - name: elasticsearch
-          image: docker.elastic.co/elasticsearch/elasticsearch:8.4.1
+          #image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.9.3
+          image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.8.23
           imagePullPolicy: IfNotPresent
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 200Mi
+            requests:
+              cpu: 100m
+              memory: 200Mi
           env:
             - name: CLUSTER_NAME
               value: elk-cluster
@@ -89,6 +97,17 @@ spec:
               containerPort: 9200
             - name: transport
               containerPort: 9300
+          livenessProbe:
+            tcpSocket:
+              port: transport
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /_cluster/health
+              port: http
+            initialDelaySeconds: 20
+            timeoutSeconds: 5
           volumeMounts:
             - name: config
               mountPath: /usr/share/elasticsearch/config/elasticsearch.yml
