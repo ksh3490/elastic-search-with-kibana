@@ -4,6 +4,20 @@ kind: Namespace
 metadata:
   name: elk
 ---
+# Create Config Map
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: elk
+  name: elasticsearch-config
+  labels:
+    name: elasticsearch
+data:
+  elasticsearch.yml: |-
+    cluster.name: ${CLUSTER_NAME}
+    node.name: ${NODE_NAME}
+    network.host: 0.0.0.0
+---
 # Create StatefulSet and Pod
 apiVersion: apps/v1
 kind: StatefulSet
@@ -34,6 +48,10 @@ spec:
           #     cpu: 100m
           #     memory: 200Mi
           env:
+            - name: CLUSTER_NAME
+              value: es-0
+            - name: NODE_NAME
+              value: node-0
             - name: discovery.type
               value: single-node
             - name: ES_JAVA_OPTS
@@ -43,6 +61,11 @@ spec:
               protocol: TCP
             - containerPort: 9300
               protocol: TCP
+          volumeMounts:
+            - name: config
+              mountPath: /usr/share/elasticsearch/config/elasticsearch.yml
+              readOnly: true
+              subPath: elasticsearch.yml
           livenessProbe:
             tcpSocket:
               port: transport
@@ -54,6 +77,10 @@ spec:
           #     port: http
           #   initialDelaySeconds: 20
           #   timeoutSeconds: 5
+      volumes:
+        - name: config
+          configMap:
+            name: elasticsearch-config
 ---
 # Create Service
 apiVersion: v1
