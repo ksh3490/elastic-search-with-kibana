@@ -15,7 +15,7 @@ metadata:
 data:
   elasticsearch.yml: |-
     cluster.name: ${CLUSTER_NAME}
-    node.name: ${NODE_NAME}
+    # node.name: ${NODE_NAME}
     network.host: 0.0.0.0
 ---
 # Create StatefulSet and Pod
@@ -28,7 +28,7 @@ metadata:
     app: elasticsearch
 spec:
   serviceName: elasticsearch
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app: elasticsearch
@@ -50,8 +50,8 @@ spec:
           env:
             - name: CLUSTER_NAME
               value: es-0
-            - name: NODE_NAME
-              value: node-0
+            # - name: NODE_NAME
+            #   value: node-0
             - name: discovery.type
               value: single-node
             - name: ES_JAVA_OPTS
