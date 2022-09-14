@@ -1,0 +1,87 @@
+# Create Config Map
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: elk
+  name: kibana-config
+  labels:
+    app: kibana
+data:
+  kibana.yml: |-
+    server.host: 0.0.0.0
+    elasticsearch.hosts: ${ELASTICSEARCH_HOSTS}
+    #elasticsearch:
+    #  hosts: ${ELASTICSEARCH_HOSTS}
+    #  username: ${ELASTICSEARCH_USER}
+    #  password: ${ELASTICSEARCH_PASSWORD}
+---
+# Create Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: elk
+  name: kibana
+  labels:
+    app: kibana
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kibana
+  template:
+    metadata:
+      labels:
+        app: kibana
+    spec:
+      containers:
+        - name: kibana
+          image: docker.elastic.co/kibana/kibana-oss:7.10.2
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: view
+              containerPort: 5601
+          env:
+            - name: ELASTICSEARCH_HOSTS
+              value: "http://elasticsearch-svc:9200"
+            #- name: ELASTICSEARCH_USER
+            #  value: "elastic"
+            #- name: ELASTICSEARCH_PASSWORD
+            #  valueFrom:
+            #    secretKeyRef:
+            #      name: elasticsearch-pw-elastic
+            #      key: password
+          volumeMounts:
+            - name: config
+              mountPath: /usr/share/kibana/config/kibana.yml
+              readOnly: true
+              subPath: kibana.yml
+            - name: tz-seoul
+              mountPath: /etc/localtime
+      volumes:
+        - name: config
+          configMap:
+            name: kibana-config
+        - name: tz-seoul
+          hostPath:
+            path: /usr/share/zoneinfo/Asia/Seoul
+---
+# Create Service
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: elk
+  name: kibana
+  labels:
+    app: kibana
+spec:
+  # type: NodePort
+  # type: LoadBalancer
+  ports:
+    - name: view
+      port: 33000
+      targetPort: 5601
+      # nodePort: 30930
+  externalIPs:
+    - 192.168.49.2
+  selector:
+    app: kibana
