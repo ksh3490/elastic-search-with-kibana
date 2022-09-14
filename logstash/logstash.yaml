@@ -6,7 +6,7 @@ metadata:
   name: logstash-config
   labels:
     task: logging
-    k8s-app: logstash
+    app: logstash
 data:
   logstash.yml: |-
     http.host: "127.0.0.0"

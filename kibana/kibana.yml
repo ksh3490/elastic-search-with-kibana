@@ -1,0 +1,42 @@
+# Create Config Map
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: elk
+  name: kibana-config
+  labels:
+    app: kibana
+data:
+  kibana.yaml: |-
+    server.host: 0.0.0.0
+    elasticsearch.hosts: ${ELASTICSEARCH_HOSTS}
+    #elasticsearch:
+    #  hosts: ${ELASTICSEARCH_HOSTS}
+    #  username: ${ELASTICSEARCH_USER}
+    #  password: ${ELASTICSEARCH_PASSWORD}
+---
+# Create Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: elk
+  name: kibana
+  labels:
+    app: kibana
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kibana
+  template:
+    metadata:
+      labels:
+        app: kibana
+    spec:
+      containers:
+        - name: kibana
+          image: docker.elastic.co/kibana/kibana-oss:7.10.2
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name:
+              containerPort: 5601
