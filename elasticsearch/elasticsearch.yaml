@@ -23,12 +23,13 @@ data:
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: elasticsearch
   namespace: elk
+  name: elasticsearch
   labels:
     app: elasticsearch
+    #role: data
 spec:
-  serviceName: elasticsearch
+  serviceName: elasticsearch-svc
   replicas: 3
   selector:
     matchLabels:
@@ -41,6 +42,7 @@ spec:
       containers:
         - name: elasticsearch
           image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2
+          imagePullPolicy: IfNotPresent
           # resources:
           #   limits:
           #     cpu: 1000m
@@ -58,10 +60,10 @@ spec:
             - name: ES_JAVA_OPTS
               value: "-Xms512m -Xmx512m"
           ports:
-            - containerPort: 9200
-              protocol: TCP
-            - containerPort: 9300
-              protocol: TCP
+            - name: rest
+              containerPort: 9200
+            - name: transport
+              containerPort: 9300
           volumeMounts:
             - name: config
               mountPath: /usr/share/elasticsearch/config/elasticsearch.yml
@@ -69,11 +71,11 @@ spec:
               subPath: elasticsearch.yml
             - name: tz-seoul
               mountPath: /etc/localtime
-          livenessProbe:
-            tcpSocket:
-              port: transport
-            initialDelaySeconds: 20
-            periodSeconds: 10
+          # livenessProbe:
+          #   tcpSocket:
+          #     port: transport
+          #   initialDelaySeconds: 20
+          #   periodSeconds: 10
           # readinessProbe:
           #   httpGet:
           #     path: /_cluster/health
