@@ -1,4 +1,4 @@
-# ELK Stack Tutorial for Single-node Cluster
+# ELK Stack Tutorial for Single-node Kubernetes Cluster
   
 ## Test Environment: 
   - Windows 10
