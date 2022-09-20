@@ -1,4 +1,4 @@
-# my-elk for Single-node Cluster on Local Environment
+# ELK Stack Tutorial for Single-node Cluster
   
 ## Test Environment: 
   - Windows 10
