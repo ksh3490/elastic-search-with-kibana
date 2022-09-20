@@ -42,7 +42,7 @@ spec:
               containerPort: 5601
           env:
             - name: ELASTICSEARCH_HOSTS
-              value: "http://elasticsearch-svc:30920"
+              value: "http://elasticsearch-svc:9200"
             #- name: ELASTICSEARCH_USER
             #  value: "elastic"
             #- name: ELASTICSEARCH_PASSWORD
