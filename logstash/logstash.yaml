@@ -31,7 +31,7 @@ data:
     {
       elasticsearch
       {
-        hosts => ["elasticsearch-svc:9200"]
+        hosts => ["${ELASTICSEARCH_HOSTS}"]
         manage_template => false
         index => "my_index"
         document_type => "doc"
@@ -57,10 +57,13 @@ spec:
       containers:
         - name: logstash
           image: docker.elastic.co/logstash/logstash-oss:7.10.2
+          imagePullPolicy: IfNotPresent
           ports:
             - name: logstash-tcp
               containerPort: 5000
-          imagePullPolicy: IfNotPresent
+          env:
+            - name: ELASTICSEARCH_HOSTS
+              value: "http://elasticsearch-svc:9200"
           volumeMounts:
             - name: config-volume
               mountPath: /usr/share/logstash/config
