@@ -40,12 +40,11 @@ data:
 ---
 # Create Deployment
 apiVersion: apps/v1
-kind: Deployment
+kind: DaemonSet
 metadata:
   namespace: elk
   name: logstash
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app: logstash
@@ -97,7 +96,6 @@ metadata:
   labels:
     app: logstash
 spec:
-  clusterIP: None
   ports:
     - name: logstash-tcp
       port: 5000
