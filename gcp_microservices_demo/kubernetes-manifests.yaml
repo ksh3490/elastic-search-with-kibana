@@ -17,10 +17,16 @@
 # ----------------------------------------------------------
 
 # [START gke_release_kubernetes_manifests_microservices_demo]
+# Create namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: microservice
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  namespace: microservice
   name: emailservice
 spec:
   selector:
@@ -76,6 +82,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  namespace: microservice
   name: emailservice
 spec:
   type: ClusterIP
@@ -89,6 +96,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  namespace: microservice
   name: checkoutservice
 spec:
   selector:
@@ -157,6 +165,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  namespace: microservice
   name: checkoutservice
 spec:
   type: ClusterIP
@@ -170,6 +179,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  namespace: microservice
   name: recommendationservice
 spec:
   selector:
@@ -229,6 +239,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  namespace: microservice
   name: recommendationservice
 spec:
   type: ClusterIP
@@ -242,6 +253,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  namespace: microservice
   name: frontend
 spec:
   selector:
@@ -328,6 +340,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  namespace: microservice
   name: frontend
 spec:
   type: ClusterIP
@@ -341,6 +354,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  namespace: microservice
   name: frontend-external
 spec:
   type: LoadBalancer
@@ -354,6 +368,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  namespace: microservice
   name: paymentservice
 spec:
   selector:
@@ -409,6 +424,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  namespace: microservice
   name: paymentservice
 spec:
   type: ClusterIP
@@ -422,6 +438,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  namespace: microservice
   name: productcatalogservice
 spec:
   selector:
@@ -479,6 +496,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  namespace: microservice
   name: productcatalogservice
 spec:
   type: ClusterIP
@@ -492,6 +510,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  namespace: microservice
   name: cartservice
 spec:
   selector:
@@ -546,6 +565,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  namespace: microservice
   name: cartservice
 spec:
   type: ClusterIP
@@ -559,6 +579,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  namespace: microservice
   name: loadgenerator
 spec:
   selector:
@@ -622,6 +643,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  namespace: microservice
   name: currencyservice
 spec:
   selector:
