@@ -71,17 +71,17 @@ spec:
               subPath: elasticsearch.yml
             - name: tz-seoul
               mountPath: /etc/localtime
-          # livenessProbe:
-          #   tcpSocket:
-          #     port: transport
-          #   initialDelaySeconds: 20
-          #   periodSeconds: 10
-          # readinessProbe:
-          #   httpGet:
-          #     path: /_cluster/health
-          #     port: http
-          #   initialDelaySeconds: 20
-          #   timeoutSeconds: 5
+          livenessProbe:
+            tcpSocket:
+              port: 9300
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /_cluster/health
+              port: 9200
+            initialDelaySeconds: 20
+            timeoutSeconds: 5
       volumes:
         - name: config
           configMap:
